@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}  # from .env
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ${DATABASE}                  # from .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  etl:
+    build: .
+    depends_on:
+      - mysql
+    environment:
+      # These environment variables will be passed into the container
+      USERNAME: ${DB_USERNAME}
+      PASSWORD: ${MYSQL_ROOT_PASSWORD}  # using same as root password
+      HOST: mysql
+      PORT: 3306
+      DATABASE: ${DATABASE}
+      CSV_PATH: /app/dataset/myntra_products_catalog.csv
+    volumes:
+      - ./dataset:/app/dataset
+
+volumes:
+  mysql_data:
