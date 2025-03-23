@@ -15,7 +15,6 @@ Copy
 
 **Note:**  
 - The `.env` file (which holds sensitive information like passwords) is excluded from version control. Use `.env.example` as a template.
-- If you have a large dataset, consider either including a small sample or providing instructions on how to obtain it.
 
 ## Getting Started
 
@@ -29,7 +28,7 @@ Copy
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
+   git clone https://github.com/CodedbyAli/etl-pipeline.git
    cd your-repo-name
 
 2. **Create Your Environment Variables File:**
