@@ -45,6 +45,29 @@ def load_data(csv_path):
         logging.error("Error reading CSV file: %s", e)
         sys.exit(1)
 
+def handle_outliers(df):
+    """
+    Identifies and handles outliers in the 'Price (INR)' column using the IQR method.
+    Here, we 'cap' the outlier values to the calculated lower or upper bound.
+    """
+    # Calculate Q1 and Q3
+    Q1 = df['Price (INR)'].quantile(0.25)
+    Q3 = df['Price (INR)'].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    # Define bounds
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Capping outliers instead of removing them
+    df.loc[df['Price (INR)'] < lower_bound, 'Price (INR)'] = lower_bound
+    df.loc[df['Price (INR)'] > upper_bound, 'Price (INR)'] = upper_bound
+    
+    logging.info("Outliers have been capped using IQR method. "
+                 "Lower bound: %.2f, Upper bound: %.2f", lower_bound, upper_bound)
+    
+    return df
+
 def remove_duplicates(df):
     """
     Removes duplicate rows from the DataFrame.
@@ -167,10 +190,7 @@ def main():
     df = correct_data_types(df)
     df = remove_brand_prefix(df)
     df = standardize_text_fields(df)
-    
-    # NOTE: Task 5 (outlier handling) was not implemented in your code.
-    # If needed, add outlier handling here.
-    
+    df = handle_outliers(df)
     df = categorize_price(df)
     df = filter_invalid_primary_color(df)
     
